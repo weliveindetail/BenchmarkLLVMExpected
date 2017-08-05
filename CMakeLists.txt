@@ -22,6 +22,10 @@ message(STATUS "System: ${OS_NAME}")
 
 add_executable(BenchmarkExpected
     BenchmarkExpected.cpp
+
+    bool_bench.cpp
+    bool_bench.h
+    bool_utils.h
 )
 
 set_target_properties(BenchmarkExpected PROPERTIES
