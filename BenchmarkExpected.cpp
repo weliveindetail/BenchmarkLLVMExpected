@@ -6,6 +6,12 @@
 using namespace std::chrono;
 
 namespace check_bool {
+
+int make_input() {
+  auto t = system_clock::now().time_since_epoch();
+  return duration_cast<milliseconds>(t).count();
+}
+
 namespace ignore_error {
 
 bool success_always(int value) {
@@ -78,12 +84,10 @@ llvm::Expected<bool> success2outof3(int value) {
 
 static void BM_Bool_SuccessAlways_IgnoreErr(benchmark::State &state) {
   while (state.KeepRunning()) {
-    auto input_time = system_clock::now().time_since_epoch();
-    auto input_millis = duration_cast<milliseconds>(input_time).count();
-
+    auto input = check_bool::make_input();
     auto S = high_resolution_clock::now();
 
-    auto res = check_bool::ignore_error::success_always(input_millis);
+    auto res = check_bool::ignore_error::success_always(input);
     (void)res;
 
     auto E = high_resolution_clock::now();
@@ -93,13 +97,11 @@ static void BM_Bool_SuccessAlways_IgnoreErr(benchmark::State &state) {
 
 static void BM_Bool_SuccessAlways_ErrorCode(benchmark::State &state) {
   while (state.KeepRunning()) {
-    auto input_time = system_clock::now().time_since_epoch();
-    auto input_millis = duration_cast<milliseconds>(input_time).count();
-
+    auto input = check_bool::make_input();
     auto S = high_resolution_clock::now();
 
     bool res;
-    auto ec = check_bool::error_code::success_always(input_millis, res);
+    auto ec = check_bool::error_code::success_always(input, res);
     (void)ec;
     (void)res;
 
@@ -110,12 +112,10 @@ static void BM_Bool_SuccessAlways_ErrorCode(benchmark::State &state) {
 
 static void BM_Bool_SuccessAlways_Expected(benchmark::State &state) {
   while (state.KeepRunning()) {
-    auto input_time = system_clock::now().time_since_epoch();
-    auto input_millis = duration_cast<milliseconds>(input_time).count();
-
+    auto input = check_bool::make_input();
     auto S = high_resolution_clock::now();
 
-    auto result = check_bool::expected::success_always(input_millis);
+    auto result = check_bool::expected::success_always(input);
 
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
@@ -127,13 +127,11 @@ static void BM_Bool_SuccessAlways_Expected(benchmark::State &state) {
 
 static void BM_Bool_Success2outOf3_ErrorCode(benchmark::State &state) {
   while (state.KeepRunning()) {
-    auto input_time = system_clock::now().time_since_epoch();
-    auto input_millis = duration_cast<milliseconds>(input_time).count();
-
+    auto input = check_bool::make_input();
     auto S = high_resolution_clock::now();
 
     bool res;
-    auto ec = check_bool::error_code::success2outof3(input_millis, res);
+    auto ec = check_bool::error_code::success2outof3(input, res);
     (void)ec;
     (void)res;
 
@@ -144,12 +142,10 @@ static void BM_Bool_Success2outOf3_ErrorCode(benchmark::State &state) {
 
 static void BM_Bool_Success2outOf3_Expected(benchmark::State &state) {
   while (state.KeepRunning()) {
-    auto input_time = system_clock::now().time_since_epoch();
-    auto input_millis = duration_cast<milliseconds>(input_time).count();
-
+    auto input = check_bool::make_input();
     auto S = high_resolution_clock::now();
 
-    auto result = check_bool::expected::success2outof3(input_millis);
+    auto result = check_bool::expected::success2outof3(input);
 
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
