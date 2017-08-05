@@ -26,6 +26,10 @@ add_executable(BenchmarkExpected
     bool_bench.cpp
     bool_bench.h
     bool_utils.h
+
+    int_bench.cpp
+    int_bench.h
+    int_utils.h
 )
 
 set_target_properties(BenchmarkExpected PROPERTIES
