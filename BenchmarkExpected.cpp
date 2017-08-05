@@ -1,42 +1,41 @@
 #include <benchmark/benchmark.h>
-#include <llvm/Support/Error.h>
-#include <chrono>
 
+#include <llvm/Support/Error.h>
+
+#include <chrono>
 using namespace std::chrono;
 
-namespace ignore {
+namespace check_bool {
+namespace ignore_error {
 
-bool isSomeModulo(int value) {
+bool success_always(int value) {
   if (value % 3 == 0) // 3, 6, 9, 12, ...
     return true;
 
-  if (value % 2 == 0) // 2, 4, 8, 10, ...
+  if (value % 6 != 0) // 1, 2, 4, 5, 7, 8, 10, 11, ...
     return false;
 
-  return false;
+  return false; // never
 }
-
-}
-
-namespace expected {
-
-llvm::Expected<bool> isSomeModulo(int value) {
-  if (value % 3 == 0) // 3, 6, 9, 12, ...
-    return true;
-
-  if (value % 2 == 0) // 2, 4, 8, 10, ...
-    return false;
-
-  // 1, 5, 7, 11, ...
-  return llvm::make_error<llvm::StringError>(
-    "Mocked Error", std::error_code(9, std::system_category()));
-}
-
 }
 
 namespace error_code {
 
-std::error_code isSomeModulo(int value, bool &res) {
+std::error_code success_always(int value, bool &res) {
+  if (value % 3 == 0) { // 3, 6, 9, 12, ...
+    res = true;
+    return std::error_code();
+  }
+
+  if (value % 6 != 0) { // 1, 2, 4, 5, 7, 8, 10, 11, ...
+    res = false;
+    return std::error_code();
+  }
+
+  return std::error_code(9, std::system_category()); // never
+}
+
+std::error_code success2outof3(int value, bool &res) {
   if (value % 3 == 0) { // 3, 6, 9, 12, ...
     res = true;
     return std::error_code();
@@ -47,20 +46,44 @@ std::error_code isSomeModulo(int value, bool &res) {
     return std::error_code();
   }
 
-  // 1, 5, 7, 11, ...
-  return std::error_code(9, std::system_category());
+  return std::error_code(9, std::system_category()); // 1, 5, 7, 11, ...
+}
 }
 
+namespace expected {
+
+llvm::Expected<bool> success_always(int value) {
+  if (value % 3 == 0) // 3, 6, 9, 12, ...
+    return true;
+
+  if (value % 6 != 0) // 1, 2, 4, 5, 7, 8, 10, 11, ...
+    return false;
+
+  return llvm::make_error<llvm::StringError>( // never
+      "Mocked Error", std::error_code(9, std::system_category()));
 }
 
-static void BM_isSomeModulo_IgnoreErr(benchmark::State& state) {
+llvm::Expected<bool> success2outof3(int value) {
+  if (value % 3 == 0) // 3, 6, 9, 12, ...
+    return true;
+
+  if (value % 2 == 0) // 2, 4, 8, 10, ...
+    return false;
+
+  return llvm::make_error<llvm::StringError>( // 1, 5, 7, 11, ...
+      "Mocked Error", std::error_code(9, std::system_category()));
+}
+}
+}
+
+static void BM_Bool_SuccessAlways_IgnoreErr(benchmark::State &state) {
   while (state.KeepRunning()) {
     auto input_time = system_clock::now().time_since_epoch();
     auto input_millis = duration_cast<milliseconds>(input_time).count();
 
     auto S = high_resolution_clock::now();
 
-    auto res = ignore::isSomeModulo(input_millis);
+    auto res = check_bool::ignore_error::success_always(input_millis);
     (void)res;
 
     auto E = high_resolution_clock::now();
@@ -68,7 +91,7 @@ static void BM_isSomeModulo_IgnoreErr(benchmark::State& state) {
   }
 }
 
-static void BM_isSomeModulo_ErrorCode(benchmark::State& state) {
+static void BM_Bool_SuccessAlways_ErrorCode(benchmark::State &state) {
   while (state.KeepRunning()) {
     auto input_time = system_clock::now().time_since_epoch();
     auto input_millis = duration_cast<milliseconds>(input_time).count();
@@ -76,23 +99,23 @@ static void BM_isSomeModulo_ErrorCode(benchmark::State& state) {
     auto S = high_resolution_clock::now();
 
     bool res;
-    auto ec = error_code::isSomeModulo(input_millis, res);
+    auto ec = check_bool::error_code::success_always(input_millis, res);
     (void)ec;
     (void)res;
-    
+
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
   }
 }
 
-static void BM_isSomeModulo_Expected(benchmark::State& state) {
+static void BM_Bool_SuccessAlways_Expected(benchmark::State &state) {
   while (state.KeepRunning()) {
     auto input_time = system_clock::now().time_since_epoch();
     auto input_millis = duration_cast<milliseconds>(input_time).count();
 
     auto S = high_resolution_clock::now();
 
-    auto result = expected::isSomeModulo(input_millis);
+    auto result = check_bool::expected::success_always(input_millis);
 
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
@@ -102,11 +125,48 @@ static void BM_isSomeModulo_Expected(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_isSomeModulo_IgnoreErr)->UseManualTime();
-BENCHMARK(BM_isSomeModulo_Expected)->UseManualTime();
-BENCHMARK(BM_isSomeModulo_ErrorCode)->UseManualTime();
+static void BM_Bool_Success2outOf3_ErrorCode(benchmark::State &state) {
+  while (state.KeepRunning()) {
+    auto input_time = system_clock::now().time_since_epoch();
+    auto input_millis = duration_cast<milliseconds>(input_time).count();
 
-int main(int argc, char** argv) {
+    auto S = high_resolution_clock::now();
+
+    bool res;
+    auto ec = check_bool::error_code::success2outof3(input_millis, res);
+    (void)ec;
+    (void)res;
+
+    auto E = high_resolution_clock::now();
+    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+  }
+}
+
+static void BM_Bool_Success2outOf3_Expected(benchmark::State &state) {
+  while (state.KeepRunning()) {
+    auto input_time = system_clock::now().time_since_epoch();
+    auto input_millis = duration_cast<milliseconds>(input_time).count();
+
+    auto S = high_resolution_clock::now();
+
+    auto result = check_bool::expected::success2outof3(input_millis);
+
+    auto E = high_resolution_clock::now();
+    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+
+    if (!result)
+      llvm::consumeError(result.takeError());
+  }
+}
+
+BENCHMARK(BM_Bool_SuccessAlways_IgnoreErr)->UseManualTime();
+BENCHMARK(BM_Bool_SuccessAlways_ErrorCode)->UseManualTime();
+BENCHMARK(BM_Bool_SuccessAlways_Expected)->UseManualTime();
+
+BENCHMARK(BM_Bool_Success2outOf3_ErrorCode)->UseManualTime();
+BENCHMARK(BM_Bool_Success2outOf3_Expected)->UseManualTime();
+
+int main(int argc, char **argv) {
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
 }
