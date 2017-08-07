@@ -20,7 +20,7 @@ static int success_always(int value) {
 
   return 0; // never
 }
-}
+} // namespace ignore_error
 
 namespace error_code {
 
@@ -79,7 +79,7 @@ static std::error_code success_never(int value, int &res) {
 
   return std::error_code(9, std::system_category()); // always
 }
-}
+} // namespace error_code
 
 namespace expected {
 
@@ -126,4 +126,4 @@ static llvm::Expected<int> success_never(int value) {
   return llvm::make_error<llvm::StringError>( // always
       "Mocked Error", std::error_code(9, std::system_category()));
 }
-}
+} // namespace expected

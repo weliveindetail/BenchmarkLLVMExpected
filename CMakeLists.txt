@@ -30,6 +30,10 @@ add_executable(BenchmarkExpected
     int_bench.cpp
     int_bench.h
     int_utils.h
+
+    unique_ptr_bench.cpp
+    unique_ptr_bench.h
+    unique_ptr_utils.h
 )
 
 set_target_properties(BenchmarkExpected PROPERTIES
