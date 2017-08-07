@@ -72,6 +72,23 @@ void BM_Bool_Success1outOf3_ErrorCode(benchmark::State &state) {
   }
 }
 
+void BM_Bool_SuccessNever_ErrorCode(benchmark::State &state) {
+  using namespace std::chrono;
+
+  while (state.KeepRunning()) {
+    auto input = make_input();
+    auto S = high_resolution_clock::now();
+
+    bool res;
+    auto ec = error_code::success_never(input, res);
+    (void)ec;
+    (void)res;
+
+    auto E = high_resolution_clock::now();
+    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+  }
+}
+
 void BM_Bool_SuccessAlways_Expected(benchmark::State &state) {
   using namespace std::chrono;
 
@@ -114,6 +131,23 @@ void BM_Bool_Success1outOf3_Expected(benchmark::State &state) {
     auto S = high_resolution_clock::now();
 
     auto result = expected::success_1outof3(input);
+
+    auto E = high_resolution_clock::now();
+    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+
+    if (!result)
+      llvm::consumeError(result.takeError());
+  }
+}
+
+void BM_Bool_SuccessNever_Expected(benchmark::State &state) {
+  using namespace std::chrono;
+
+  while (state.KeepRunning()) {
+    auto input = make_input();
+    auto S = high_resolution_clock::now();
+
+    auto result = expected::success_never(input);
 
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());

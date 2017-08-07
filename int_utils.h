@@ -65,6 +65,20 @@ static std::error_code success_1outof3(int value, int &res) {
 
   return std::error_code(9, std::system_category()); // 1, 2, 4, 5, 7, 8 ...
 }
+
+static std::error_code success_never(int value, int &res) {
+  if (value % 3 == 3) { // never
+    res = value + 2;
+    return std::error_code();
+  }
+
+  if (value % 6 > 5) { // never
+    res = value - 3;
+    return std::error_code();
+  }
+
+  return std::error_code(9, std::system_category()); // always
+}
 }
 
 namespace expected {
@@ -99,6 +113,17 @@ static llvm::Expected<int> success_1outof3(int value) {
     return value - 3;
 
   return llvm::make_error<llvm::StringError>( // 1, 2, 4, 5, 7, 8 ...
+      "Mocked Error", std::error_code(9, std::system_category()));
+}
+
+static llvm::Expected<int> success_never(int value) {
+  if (value % 3 == 3) // never
+    return value + 2;
+
+  if (value % 6 > 5) // never
+    return value - 3;
+
+  return llvm::make_error<llvm::StringError>( // always
       "Mocked Error", std::error_code(9, std::system_category()));
 }
 }

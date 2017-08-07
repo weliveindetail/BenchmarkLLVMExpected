@@ -9,3 +9,6 @@ void BM_Bool_Success2outOf3_Expected(benchmark::State &state);
 
 void BM_Bool_Success1outOf3_ErrorCode(benchmark::State &state);
 void BM_Bool_Success1outOf3_Expected(benchmark::State &state);
+
+void BM_Bool_SuccessNever_ErrorCode(benchmark::State &state);
+void BM_Bool_SuccessNever_Expected(benchmark::State &state);
