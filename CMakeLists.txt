@@ -34,6 +34,10 @@ add_executable(BenchmarkExpected
     unique_ptr_bench.cpp
     unique_ptr_bench.h
     unique_ptr_utils.h
+
+    vector_bench.cpp
+    vector_bench.h
+    vector_utils.h
 )
 
 set_target_properties(BenchmarkExpected PROPERTIES
@@ -46,7 +50,7 @@ message("")
 message("LLVM")
 
 # add LLVM libraries, set LLVM_* variables
-find_package(LLVM 5.0 REQUIRED PATHS ${LLVM_DIR})
+find_package(LLVM 4.0 REQUIRED PATHS ${LLVM_DIR})
 message(STATUS "LLVM_DIR: ${LLVM_DIR}")
 message(STATUS "LLVM_PACKAGE_VERSION: ${LLVM_PACKAGE_VERSION}")
 
