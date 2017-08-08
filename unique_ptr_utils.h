@@ -5,7 +5,7 @@
 
 #include <llvm/Support/Error.h>
 
-static int make_input() {
+static int make_input() noexcept {
   using namespace std::chrono;
   auto t = system_clock::now().time_since_epoch();
   return duration_cast<milliseconds>(t).count();
@@ -15,8 +15,8 @@ static int make_input() {
 
 namespace error_code {
 
-static std::unique_ptr<std::vector<int>> no_errors(int value,
-                                                        std::error_code &ec) {
+static std::unique_ptr<std::vector<int>>
+no_errors(int value, std::error_code &ec) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -30,8 +30,8 @@ static std::unique_ptr<std::vector<int>> no_errors(int value,
   return v; // always
 }
 
-static std::unique_ptr<std::vector<int>> success_always(int value,
-                                                        std::error_code &ec) {
+static std::unique_ptr<std::vector<int>>
+success_always(int value, std::error_code &ec) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -47,8 +47,8 @@ static std::unique_ptr<std::vector<int>> success_always(int value,
   return v; // always
 }
 
-static std::unique_ptr<std::vector<int>> success_2outof3(int value,
-                                                         std::error_code &ec) {
+static std::unique_ptr<std::vector<int>>
+success_2outof3(int value, std::error_code &ec) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -64,8 +64,8 @@ static std::unique_ptr<std::vector<int>> success_2outof3(int value,
   return v; // 1, 3, 4, 6, 7, 9, 10, ...
 }
 
-static std::unique_ptr<std::vector<int>> success_1outof3(int value,
-                                                         std::error_code &ec) {
+static std::unique_ptr<std::vector<int>>
+success_1outof3(int value, std::error_code &ec) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -81,8 +81,8 @@ static std::unique_ptr<std::vector<int>> success_1outof3(int value,
   return v; // 3, 6, 9, 12, ...
 }
 
-static std::unique_ptr<std::vector<int>> success_never(int value,
-                                                       std::error_code &ec) {
+static std::unique_ptr<std::vector<int>>
+success_never(int value, std::error_code &ec) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -104,7 +104,7 @@ static std::unique_ptr<std::vector<int>> success_never(int value,
 namespace expected {
 
 static llvm::Expected<std::unique_ptr<std::vector<int>>>
-no_errors(int value) {
+no_errors(int value) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -119,7 +119,7 @@ no_errors(int value) {
 }
 
 static llvm::Expected<std::unique_ptr<std::vector<int>>>
-success_always(int value) {
+success_always(int value) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -135,7 +135,7 @@ success_always(int value) {
 }
 
 static llvm::Expected<std::unique_ptr<std::vector<int>>>
-success_2outof3(int value) {
+success_2outof3(int value) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -151,7 +151,7 @@ success_2outof3(int value) {
 }
 
 static llvm::Expected<std::unique_ptr<std::vector<int>>>
-success_1outof3(int value) {
+success_1outof3(int value) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)
@@ -167,7 +167,7 @@ success_1outof3(int value) {
 }
 
 static llvm::Expected<std::unique_ptr<std::vector<int>>>
-success_never(int value) {
+success_never(int value) noexcept {
   auto v = std::make_unique<std::vector<int>>();
 
   if (value % 4 < 2)

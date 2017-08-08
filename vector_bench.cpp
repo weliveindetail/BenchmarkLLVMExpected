@@ -26,7 +26,6 @@ void BM_Vector_NoErrors_ErrorCode(benchmark::State &state) {
   }
 }
 
-
 void BM_Vector_SuccessAlways_ErrorCode(benchmark::State &state) {
   using namespace std::chrono;
 
@@ -113,7 +112,6 @@ void BM_Vector_NoErrors_Expected(benchmark::State &state) {
       llvm::consumeError(result.takeError());
   }
 }
-
 
 void BM_Vector_SuccessAlways_Expected(benchmark::State &state) {
   using namespace std::chrono;

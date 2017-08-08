@@ -5,7 +5,7 @@
 
 #include <llvm/Support/Error.h>
 
-static int make_input() {
+static int make_input() noexcept {
   using namespace std::chrono;
   auto t = system_clock::now().time_since_epoch();
   return duration_cast<milliseconds>(t).count();
@@ -15,7 +15,7 @@ static int make_input() {
 
 namespace error_code {
 
-static std::vector<int> no_errors(int value, std::error_code &ec) {
+static std::vector<int> no_errors(int value, std::error_code &ec) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -29,7 +29,8 @@ static std::vector<int> no_errors(int value, std::error_code &ec) {
   return v; // always
 }
 
-static std::vector<int> success_always(int value, std::error_code &ec) {
+static std::vector<int> success_always(int value,
+                                       std::error_code &ec) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -45,7 +46,8 @@ static std::vector<int> success_always(int value, std::error_code &ec) {
   return v; // always
 }
 
-static std::vector<int> success_2outof3(int value, std::error_code &ec) {
+static std::vector<int> success_2outof3(int value,
+                                        std::error_code &ec) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -61,7 +63,8 @@ static std::vector<int> success_2outof3(int value, std::error_code &ec) {
   return v; // 1, 3, 4, 6, 7, 9, 10, ...
 }
 
-static std::vector<int> success_1outof3(int value, std::error_code &ec) {
+static std::vector<int> success_1outof3(int value,
+                                        std::error_code &ec) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -77,7 +80,7 @@ static std::vector<int> success_1outof3(int value, std::error_code &ec) {
   return v; // 3, 6, 9, 12, ...
 }
 
-static std::vector<int> success_never(int value, std::error_code &ec) {
+static std::vector<int> success_never(int value, std::error_code &ec) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -98,7 +101,7 @@ static std::vector<int> success_never(int value, std::error_code &ec) {
 
 namespace expected {
 
-static llvm::Expected<std::vector<int>> no_errors(int value) {
+static llvm::Expected<std::vector<int>> no_errors(int value) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -112,7 +115,7 @@ static llvm::Expected<std::vector<int>> no_errors(int value) {
   return std::move(v); // always
 }
 
-static llvm::Expected<std::vector<int>> success_always(int value) {
+static llvm::Expected<std::vector<int>> success_always(int value) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -127,7 +130,7 @@ static llvm::Expected<std::vector<int>> success_always(int value) {
   return std::move(v); // always
 }
 
-static llvm::Expected<std::vector<int>> success_2outof3(int value) {
+static llvm::Expected<std::vector<int>> success_2outof3(int value) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -142,7 +145,7 @@ static llvm::Expected<std::vector<int>> success_2outof3(int value) {
   return std::move(v); // 1, 3, 4, 6, 7, 9, 10, ...
 }
 
-static llvm::Expected<std::vector<int>> success_1outof3(int value) {
+static llvm::Expected<std::vector<int>> success_1outof3(int value) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)
@@ -157,7 +160,7 @@ static llvm::Expected<std::vector<int>> success_1outof3(int value) {
   return std::move(v); // 3, 6, 9, 12, ...
 }
 
-static llvm::Expected<std::vector<int>> success_never(int value) {
+static llvm::Expected<std::vector<int>> success_never(int value) noexcept {
   std::vector<int> v;
 
   if (value % 4 < 2)

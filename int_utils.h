@@ -3,7 +3,7 @@
 
 #include <llvm/Support/Error.h>
 
-static int make_input() {
+static int make_input() noexcept {
   using namespace std::chrono;
   auto t = system_clock::now().time_since_epoch();
   return duration_cast<milliseconds>(t).count();
@@ -11,7 +11,7 @@ static int make_input() {
 
 namespace error_code {
 
-static std::error_code no_errors(int value, int &res) {
+static std::error_code no_errors(int value, int &res) noexcept {
   if (value % 3 == 0) { // 3, 6, 9, 12, ...
     res = value + 2;
     return std::error_code();
@@ -25,7 +25,7 @@ static std::error_code no_errors(int value, int &res) {
   llvm_unreachable();
 }
 
-static std::error_code success_always(int value, int &res) {
+static std::error_code success_always(int value, int &res) noexcept {
   if (value % 3 == 0) { // 3, 6, 9, 12, ...
     res = value + 2;
     return std::error_code();
@@ -39,7 +39,7 @@ static std::error_code success_always(int value, int &res) {
   return std::error_code(9, std::system_category()); // never
 }
 
-static std::error_code success_2outof3(int value, int &res) {
+static std::error_code success_2outof3(int value, int &res) noexcept {
   if (value % 3 == 0) { // 3, 6, 9, 12, ...
     res = value + 2;
     return std::error_code();
@@ -53,7 +53,7 @@ static std::error_code success_2outof3(int value, int &res) {
   return std::error_code(9, std::system_category()); // 1, 5, 7, 11, ...
 }
 
-static std::error_code success_1outof3(int value, int &res) {
+static std::error_code success_1outof3(int value, int &res) noexcept {
   if (value % 6 == 0) { // 6, ...
     res = value + 2;
     return std::error_code();
@@ -67,7 +67,7 @@ static std::error_code success_1outof3(int value, int &res) {
   return std::error_code(9, std::system_category()); // 1, 2, 4, 5, 7, 8 ...
 }
 
-static std::error_code success_never(int value, int &res) {
+static std::error_code success_never(int value, int &res) noexcept {
   if (value % 3 == 3) { // never
     res = value + 2;
     return std::error_code();
@@ -84,7 +84,7 @@ static std::error_code success_never(int value, int &res) {
 
 namespace expected {
 
-static llvm::Expected<int> no_errors(int value) {
+static llvm::Expected<int> no_errors(int value) noexcept {
   if (value % 3 == 0) // 3, 6, 9, 12, ...
     return value + 2;
 
@@ -94,7 +94,7 @@ static llvm::Expected<int> no_errors(int value) {
   llvm_unreachable();
 }
 
-static llvm::Expected<int> success_always(int value) {
+static llvm::Expected<int> success_always(int value) noexcept {
   if (value % 3 == 0) // 3, 6, 9, 12, ...
     return value + 2;
 
@@ -105,7 +105,7 @@ static llvm::Expected<int> success_always(int value) {
       "Mocked Error", std::error_code(9, std::system_category()));
 }
 
-static llvm::Expected<int> success_2outof3(int value) {
+static llvm::Expected<int> success_2outof3(int value) noexcept {
   if (value % 3 == 0) // 3, 6, 9, 12, ...
     return value + 2;
 
@@ -116,7 +116,7 @@ static llvm::Expected<int> success_2outof3(int value) {
       "Mocked Error", std::error_code(9, std::system_category()));
 }
 
-static llvm::Expected<int> success_1outof3(int value) {
+static llvm::Expected<int> success_1outof3(int value) noexcept {
   if (value % 6 == 0) // 6, ...
     return value + 2;
 
@@ -127,7 +127,7 @@ static llvm::Expected<int> success_1outof3(int value) {
       "Mocked Error", std::error_code(9, std::system_category()));
 }
 
-static llvm::Expected<int> success_never(int value) {
+static llvm::Expected<int> success_never(int value) noexcept {
   if (value % 3 == 3) // never
     return value + 2;
 
