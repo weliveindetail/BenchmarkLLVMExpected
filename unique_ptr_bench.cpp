@@ -7,60 +7,19 @@
 
 #include <llvm/Support/Error.h>
 
-void BM_UniquePtr_SuccessAlways_IgnoreErr(benchmark::State &state) {
+// -----------------------------------------------------------------------------
+
+void BM_UniquePtr_NoErrors_ErrorCode(benchmark::State &state) {
   using namespace std::chrono;
 
   while (state.KeepRunning()) {
     auto input = make_input();
     auto S = high_resolution_clock::now();
 
-    auto res = ignore_error::success_always(input);
+    std::error_code ec;
+    auto res = error_code::no_errors(input, ec);
     (void)res;
-
-    auto E = high_resolution_clock::now();
-    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
-  }
-}
-
-void BM_UniquePtr_Success2outOf3_IgnoreErr(benchmark::State &state) {
-  using namespace std::chrono;
-
-  while (state.KeepRunning()) {
-    auto input = make_input();
-    auto S = high_resolution_clock::now();
-
-    auto res = ignore_error::success_2outof3(input);
-    (void)res;
-
-    auto E = high_resolution_clock::now();
-    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
-  }
-}
-
-void BM_UniquePtr_Success1outOf3_IgnoreErr(benchmark::State &state) {
-  using namespace std::chrono;
-
-  while (state.KeepRunning()) {
-    auto input = make_input();
-    auto S = high_resolution_clock::now();
-
-    auto res = ignore_error::success_1outof3(input);
-    (void)res;
-
-    auto E = high_resolution_clock::now();
-    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
-  }
-}
-
-void BM_UniquePtr_SuccessNever_IgnoreErr(benchmark::State &state) {
-  using namespace std::chrono;
-
-  while (state.KeepRunning()) {
-    auto input = make_input();
-    auto S = high_resolution_clock::now();
-
-    auto res = ignore_error::success_never(input);
-    (void)res;
+    (void)ec;
 
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
@@ -132,6 +91,25 @@ void BM_UniquePtr_SuccessNever_ErrorCode(benchmark::State &state) {
 
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+void BM_UniquePtr_NoErrors_Expected(benchmark::State &state) {
+  using namespace std::chrono;
+
+  while (state.KeepRunning()) {
+    auto input = make_input();
+    auto S = high_resolution_clock::now();
+
+    auto result = expected::no_errors(input);
+
+    auto E = high_resolution_clock::now();
+    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+
+    if (!result)
+      llvm::consumeError(result.takeError());
   }
 }
 

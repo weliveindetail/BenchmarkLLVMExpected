@@ -9,20 +9,21 @@ static int make_input() {
   return duration_cast<milliseconds>(t).count();
 }
 
-namespace ignore_error {
-
-static int success_always(int value) {
-  if (value % 3 == 0) // 3, 6, 9, 12, ...
-    return value + 2;
-
-  if (value % 6 != 0) // 1, 2, 4, 5, 7, 8, 10, 11, ...
-    return value - 3;
-
-  return 0; // never
-}
-} // namespace ignore_error
-
 namespace error_code {
+
+static std::error_code no_errors(int value, int &res) {
+  if (value % 3 == 0) { // 3, 6, 9, 12, ...
+    res = value + 2;
+    return std::error_code();
+  }
+
+  if (value % 6 != 0) { // 1, 2, 4, 5, 7, 8, 10, 11, ...
+    res = value - 3;
+    return std::error_code();
+  }
+
+  llvm_unreachable();
+}
 
 static std::error_code success_always(int value, int &res) {
   if (value % 3 == 0) { // 3, 6, 9, 12, ...
@@ -82,6 +83,16 @@ static std::error_code success_never(int value, int &res) {
 } // namespace error_code
 
 namespace expected {
+
+static llvm::Expected<int> no_errors(int value) {
+  if (value % 3 == 0) // 3, 6, 9, 12, ...
+    return value + 2;
+
+  if (value % 6 != 0) // 1, 2, 4, 5, 7, 8, 10, 11, ...
+    return value - 3;
+
+  llvm_unreachable();
+}
 
 static llvm::Expected<int> success_always(int value) {
   if (value % 3 == 0) // 3, 6, 9, 12, ...

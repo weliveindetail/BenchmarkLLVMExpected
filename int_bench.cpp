@@ -6,14 +6,18 @@
 
 #include <llvm/Support/Error.h>
 
-void BM_Int_SuccessAlways_IgnoreErr(benchmark::State &state) {
+// -----------------------------------------------------------------------------
+
+void BM_Int_NoErrors_ErrorCode(benchmark::State &state) {
   using namespace std::chrono;
 
   while (state.KeepRunning()) {
     auto input = make_input();
     auto S = high_resolution_clock::now();
 
-    auto res = ignore_error::success_always(input);
+    int res;
+    auto ec = error_code::no_errors(input, res);
+    (void)ec;
     (void)res;
 
     auto E = high_resolution_clock::now();
@@ -86,6 +90,25 @@ void BM_Int_SuccessNever_ErrorCode(benchmark::State &state) {
 
     auto E = high_resolution_clock::now();
     state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+void BM_Int_NoErrors_Expected(benchmark::State &state) {
+  using namespace std::chrono;
+
+  while (state.KeepRunning()) {
+    auto input = make_input();
+    auto S = high_resolution_clock::now();
+
+    auto result = expected::no_errors(input);
+
+    auto E = high_resolution_clock::now();
+    state.SetIterationTime(duration_cast<duration<double>>(E - S).count());
+
+    if (!result)
+      llvm::consumeError(result.takeError());
   }
 }
 

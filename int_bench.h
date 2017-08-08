@@ -1,6 +1,8 @@
 #include <benchmark/benchmark.h>
 
-void BM_Int_SuccessAlways_IgnoreErr(benchmark::State &state);
+void BM_Int_NoErrors_ErrorCode(benchmark::State &state);
+void BM_Int_NoErrors_Expected(benchmark::State &state);
+
 void BM_Int_SuccessAlways_ErrorCode(benchmark::State &state);
 void BM_Int_SuccessAlways_Expected(benchmark::State &state);
 

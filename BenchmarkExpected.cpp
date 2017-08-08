@@ -4,6 +4,14 @@
 
 #include <benchmark/benchmark.h>
 
+// no error path in callee
+BENCHMARK(BM_Int_NoErrors_ErrorCode)->UseManualTime();
+BENCHMARK(BM_Int_NoErrors_Expected)->UseManualTime();
+BENCHMARK(BM_UniquePtr_NoErrors_ErrorCode)->UseManualTime();
+BENCHMARK(BM_UniquePtr_NoErrors_Expected)->UseManualTime();
+BENCHMARK(BM_Vector_NoErrors_ErrorCode)->UseManualTime();
+BENCHMARK(BM_Vector_NoErrors_Expected)->UseManualTime();
+
 // int data
 BENCHMARK(BM_Int_SuccessAlways_ErrorCode)->UseManualTime();
 BENCHMARK(BM_Int_Success2outOf3_ErrorCode)->UseManualTime();
@@ -16,11 +24,6 @@ BENCHMARK(BM_Int_Success1outOf3_Expected)->UseManualTime();
 BENCHMARK(BM_Int_SuccessNever_Expected)->UseManualTime();
 
 // unique_ptr data
-BENCHMARK(BM_UniquePtr_SuccessAlways_IgnoreErr)->UseManualTime();
-BENCHMARK(BM_UniquePtr_Success2outOf3_IgnoreErr)->UseManualTime();
-BENCHMARK(BM_UniquePtr_Success1outOf3_IgnoreErr)->UseManualTime();
-BENCHMARK(BM_UniquePtr_SuccessNever_IgnoreErr)->UseManualTime();
-
 BENCHMARK(BM_UniquePtr_SuccessAlways_ErrorCode)->UseManualTime();
 BENCHMARK(BM_UniquePtr_Success2outOf3_ErrorCode)->UseManualTime();
 BENCHMARK(BM_UniquePtr_Success1outOf3_ErrorCode)->UseManualTime();
@@ -32,11 +35,6 @@ BENCHMARK(BM_UniquePtr_Success1outOf3_Expected)->UseManualTime();
 BENCHMARK(BM_UniquePtr_SuccessNever_Expected)->UseManualTime();
 
 // vector data
-BENCHMARK(BM_Vector_SuccessAlways_IgnoreErr)->UseManualTime();
-BENCHMARK(BM_Vector_Success2outOf3_IgnoreErr)->UseManualTime();
-BENCHMARK(BM_Vector_Success1outOf3_IgnoreErr)->UseManualTime();
-BENCHMARK(BM_Vector_SuccessNever_IgnoreErr)->UseManualTime();
-
 BENCHMARK(BM_Vector_SuccessAlways_ErrorCode)->UseManualTime();
 BENCHMARK(BM_Vector_Success2outOf3_ErrorCode)->UseManualTime();
 BENCHMARK(BM_Vector_Success1outOf3_ErrorCode)->UseManualTime();

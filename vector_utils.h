@@ -11,11 +11,12 @@ static int make_input() {
   return duration_cast<milliseconds>(t).count();
 }
 
-namespace ignore_error {
+// -----------------------------------------------------------------------------
 
-static std::vector<int> success_always(int value) {
+namespace error_code {
+
+static std::vector<int> no_errors(int value, std::error_code &ec) {
   std::vector<int> v;
-  // v.reserve(1);
 
   if (value % 4 < 2)
     v.push_back(value + 2);
@@ -23,58 +24,10 @@ static std::vector<int> success_always(int value) {
     v.push_back(value - 1);
 
   if (value % 3 > 2) // never
-    return {};
+    llvm_unreachable();
 
   return v; // always
 }
-
-static std::vector<int> success_2outof3(int value) {
-  std::vector<int> v;
-  // v.reserve(1);
-
-  if (value % 4 < 2)
-    v.push_back(value + 2);
-  else
-    v.push_back(value - 1);
-
-  if (value % 3 > 1) // 2, 5, 8, 11, ...
-    return {};
-
-  return v; // 1, 3, 4, 6, 7, 9, 10, ...
-}
-
-static std::vector<int> success_1outof3(int value) {
-  std::vector<int> v;
-  // v.reserve(1);
-
-  if (value % 4 < 2)
-    v.push_back(value + 2);
-  else
-    v.push_back(value - 1);
-
-  if (value % 3 > 0) // 1, 2, 4, 5, 7, 8, 10, 11, ...
-    return {};
-
-  return v; // 3, 6, 9, 12, ...
-}
-
-static std::vector<int> success_never(int value) {
-  std::vector<int> v;
-  // v.reserve(1);
-
-  if (value % 4 < 2)
-    v.push_back(value + 2);
-  else
-    v.push_back(value - 1);
-
-  if (value % 3 < 5) // always
-    return {};
-
-  return v; // never
-}
-} // namespace ignore_error
-
-namespace error_code {
 
 static std::vector<int> success_always(int value, std::error_code &ec) {
   std::vector<int> v;
@@ -141,7 +94,23 @@ static std::vector<int> success_never(int value, std::error_code &ec) {
 }
 } // namespace error_code
 
+// -----------------------------------------------------------------------------
+
 namespace expected {
+
+static llvm::Expected<std::vector<int>> no_errors(int value) {
+  std::vector<int> v;
+
+  if (value % 4 < 2)
+    v.push_back(value + 2);
+  else
+    v.push_back(value - 1);
+
+  if (value % 3 > 2) // never
+    llvm_unreachable();
+
+  return std::move(v); // always
+}
 
 static llvm::Expected<std::vector<int>> success_always(int value) {
   std::vector<int> v;
