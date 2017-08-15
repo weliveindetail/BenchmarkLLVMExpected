@@ -7,14 +7,11 @@ cmake_policy(SET CMP0053 NEW) # simplify variable reference and escape sequence 
 project(BenchmarkExpected VERSION 1.0 LANGUAGES CXX)
 
 if(WIN32)
-    set(OS_NAME "Win")
-    set(DISABLE_RTTI_FLAG /GR-)
+    set(OS_NAME Win)
 elseif(APPLE)
-    set(OS_NAME "OSX")
-    set(DISABLE_RTTI_FLAG -fno-rtti)
+    set(OS_NAME OSX)
 elseif(UNIX)
-    set(OS_NAME "Linux")
-    set(DISABLE_RTTI_FLAG -fno-rtti)
+    set(OS_NAME Linux)
 else()
     message(FATAL_ERROR "Operating system not supported")
 endif()
@@ -22,18 +19,13 @@ message(STATUS "System: ${OS_NAME}")
 
 add_executable(BenchmarkExpected
     BenchmarkExpected.cpp
-
-    int_bench.cpp
-    int_bench.h
-    int_utils.h
-
-    unique_ptr_bench.cpp
-    unique_ptr_bench.h
-    unique_ptr_utils.h
-
-    vector_bench.cpp
-    vector_bench.h
-    vector_utils.h
+    FastRand.h
+    BenchOptimizations.h
+    BenchOptimizations.cpp
+    BenchPerfCategories.h
+    BenchPerfCategories.cpp
+    BenchSuccessRates.h
+    BenchSuccessRates.cpp
 )
 
 set_target_properties(BenchmarkExpected PROPERTIES
@@ -46,16 +38,12 @@ message("")
 message("LLVM")
 
 # add LLVM libraries, set LLVM_* variables
-find_package(LLVM 4.0 REQUIRED PATHS ${LLVM_DIR})
+find_package(LLVM 5.0 REQUIRED PATHS ${LLVM_DIR})
 message(STATUS "LLVM_DIR: ${LLVM_DIR}")
 message(STATUS "LLVM_PACKAGE_VERSION: ${LLVM_PACKAGE_VERSION}")
 
 message(STATUS "LLVM Source Directory: ${LLVM_BUILD_MAIN_SRC_DIR}")
 message(STATUS "LLVM Build Directory: ${LLVM_BUILD_BINARY_DIR}")
-
-if(NOT LLVM_ENABLE_RTTI)
-    target_compile_options(BenchmarkExpected PRIVATE ${DISABLE_RTTI_FLAG})
-endif()
 
 message("")
 message("Google Benchmark")
@@ -71,6 +59,13 @@ target_include_directories(BenchmarkExpected PRIVATE
 separate_arguments(LLVM_DEFINITIONS)
 target_compile_definitions(BenchmarkExpected PRIVATE
     ${LLVM_DEFINITIONS}
+)
+
+target_compile_options(BenchmarkExpected PRIVATE
+    -fno-rtti
+    -fno-exceptions
+    -fomit-frame-pointer
+    -fno-stack-protector
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS 
