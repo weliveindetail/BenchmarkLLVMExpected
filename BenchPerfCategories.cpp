@@ -57,10 +57,44 @@ void BM_Category_FastRand_FunctionPtrCall(benchmark::State &state) noexcept {
 // Runtime of minimal heap allocation + deallocation
 void BM_Category_HeapAllocDealloc(benchmark::State &state) noexcept {
   while (state.KeepRunning()) {
-    char *heapMem = new char[8];
-    *heapMem = fastrand();
+    int *heapMem = new int;
     benchmark::DoNotOptimize(heapMem);
-    delete[] heapMem;
+    delete heapMem;
+  }
+}
+
+__attribute__((noinline))
+void UniquePtrReceiver(std::unique_ptr<int> value) noexcept {
+  benchmark::DoNotOptimize(value);
+}
+
+// Overhead of passing a unique_ptr to a function by move
+void BM_Category_HeapAllocDealloc_UniquePtrMove(benchmark::State &state) noexcept {
+  while (state.KeepRunning()) {
+    auto value = std::make_unique<int>(42);
+    UniquePtrReceiver(std::move(value));
+  }
+}
+
+__attribute__((noinline))
+void SharedPtrReceiver(std::shared_ptr<int> value) noexcept {
+  benchmark::DoNotOptimize(value);
+}
+
+// Overhead of passing a shared_ptr to a function by move
+void BM_Category_HeapAllocDealloc_SharedPtrMove(benchmark::State &state) noexcept {
+  while (state.KeepRunning()) {
+    auto value = std::make_shared<int>(42);
+    SharedPtrReceiver(std::move(value));
+  }
+}
+
+// Overhead of passing a shared_ptr to a function by copy
+void BM_Category_HeapAllocDealloc_SharedPtrCopy(benchmark::State &state) noexcept {
+  while (state.KeepRunning()) {
+    auto value = std::make_shared<int>(42);
+    SharedPtrReceiver(value);
+    benchmark::DoNotOptimize(value);
   }
 }
 

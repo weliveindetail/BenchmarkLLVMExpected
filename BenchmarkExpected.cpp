@@ -13,6 +13,9 @@ BENCHMARK(BM_Category_FastRand_BranchInstruction);
 BENCHMARK(BM_Category_FastRand_FunctionCall);
 BENCHMARK(BM_Category_FastRand_FunctionPtrCall);
 BENCHMARK(BM_Category_HeapAllocDealloc);
+BENCHMARK(BM_Category_HeapAllocDealloc_UniquePtrMove);
+BENCHMARK(BM_Category_HeapAllocDealloc_SharedPtrMove);
+BENCHMARK(BM_Category_HeapAllocDealloc_SharedPtrCopy);
 BENCHMARK(BM_Category_DiskReadAccess);
 
 BENCHMARK(BM_MinStruct_NoInline_Raw);
