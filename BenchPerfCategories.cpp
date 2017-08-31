@@ -1,6 +1,7 @@
 #include "BenchPerfCategories.h"
 #include "FastRand.h"
 
+// Runtime for generating a single pseudo-random number
 void BM_Category_FastRand(benchmark::State &state) noexcept {
   while (state.KeepRunning()) {
     auto input = fastrand();
@@ -8,55 +9,52 @@ void BM_Category_FastRand(benchmark::State &state) noexcept {
   }
 }
 
-__attribute__((noinline))
-void FunctionCall_NoInline(int input) noexcept {
-  benchmark::DoNotOptimize(input);
-}
-
-void BM_Category_FunctionCall(benchmark::State &state) noexcept {
+// Overhead of minimal unpredictable branch instruction
+void BM_Category_FastRand_BranchInstruction(benchmark::State &state) noexcept {
   while (state.KeepRunning()) {
-    FunctionCall_NoInline(fastrand());
-  }
-}
-
-void BM_Category_BranchInstruction(benchmark::State &state) noexcept {
-  while (state.KeepRunning()) {
-    int input = fastrand();
-    if (input % 2)
-      benchmark::DoNotOptimize(input + 1);
+    if (fastrand() % 2)
+      benchmark::ClobberMemory();
     else
-      benchmark::DoNotOptimize(input + 2);
+      benchmark::ClobberMemory();
   }
 }
 
-class BBase {
-public:
-  virtual ~BBase() {};
-  virtual void virtualFunction() = 0;
-};
+__attribute__((noinline))
+void FunctionCall1_NoInline() noexcept {
+  benchmark::ClobberMemory();
+}
 
-class BDerived1 : public BBase {
-public:
-  ~BDerived1() override = default;
-  void virtualFunction() override { benchmark::ClobberMemory(); };
-};
+__attribute__((noinline))
+void FunctionCall2_NoInline() noexcept {
+  benchmark::ClobberMemory();
+}
 
-class BDerived2 : public BBase {
-public:
-  ~BDerived2() override = default;
-  void virtualFunction() override { benchmark::ClobberMemory(); };
-};
-
-void BM_Category_VirtualFunctionCall(benchmark::State &state) noexcept {
+// Overhead of minimal unpredictable function call
+void BM_Category_FastRand_FunctionCall(benchmark::State &state) noexcept {
   while (state.KeepRunning()) {
-    BDerived1 d1;
-    BDerived2 d2;
-    BBase *b = (fastrand() % 2) ? static_cast<BBase *>(&d1)
-                                : static_cast<BBase *>(&d2);
-    b->virtualFunction();
+    if (fastrand() % 2)
+      FunctionCall1_NoInline();
+    else
+      FunctionCall2_NoInline();
   }
 }
 
+void FunctionPtrCall1() noexcept {
+  benchmark::ClobberMemory();
+}
+
+void FunctionPtrCall2() noexcept {
+  benchmark::ClobberMemory();
+}
+
+// Overhead of minimal unpredictable function pointer call (like virtual func.)
+void BM_Category_FastRand_FunctionPtrCall(benchmark::State &state) noexcept {
+  while (state.KeepRunning()) {
+    ((fastrand() % 2) ? &FunctionPtrCall1 : &FunctionPtrCall2)();
+  }
+}
+
+// Runtime of minimal heap allocation + deallocation
 void BM_Category_HeapAllocDealloc(benchmark::State &state) noexcept {
   while (state.KeepRunning()) {
     char *heapMem = new char[8];
@@ -66,12 +64,13 @@ void BM_Category_HeapAllocDealloc(benchmark::State &state) noexcept {
   }
 }
 
-void BM_Category_DiskAccess(benchmark::State &state) noexcept {
+// Overhead of minimal read access to hard disk
+void BM_Category_DiskReadAccess(benchmark::State &state) noexcept {
   while (state.KeepRunning()) {
     FILE *file = fopen("/usr/include/stdio.h", "r");
     int firstChar = getc(file);
     fclose(file);
-    
+
     benchmark::DoNotOptimize(firstChar);
   }
 }

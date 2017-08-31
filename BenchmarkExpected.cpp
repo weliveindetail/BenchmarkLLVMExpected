@@ -9,11 +9,11 @@
 #include <thread>
 
 BENCHMARK(BM_Category_FastRand);
-BENCHMARK(BM_Category_FunctionCall);
-BENCHMARK(BM_Category_BranchInstruction);
-BENCHMARK(BM_Category_VirtualFunctionCall);
+BENCHMARK(BM_Category_FastRand_BranchInstruction);
+BENCHMARK(BM_Category_FastRand_FunctionCall);
+BENCHMARK(BM_Category_FastRand_FunctionPtrCall);
 BENCHMARK(BM_Category_HeapAllocDealloc);
-BENCHMARK(BM_Category_DiskAccess);
+BENCHMARK(BM_Category_DiskReadAccess);
 
 BENCHMARK(BM_MinStruct_NoInline_Raw);
 BENCHMARK(BM_MinStruct_NoInline_ExpectedSuccess);
