@@ -19,7 +19,7 @@ static llvm::Expected<A> MinStruct_NoInline_ExpectedSuccess(int input) noexcept 
 
 __attribute__((noinline))
 static llvm::Expected<A> MinStruct_NoInline_ExpectedFail(int input) noexcept {
-  return llvm::make_error<llvm::StringError>("mock", std::error_code(1, std::system_category()));
+  return llvm::make_error<llvm::StringError>("mock", llvm::inconvertibleErrorCode());
 }
 
 void REF_MinStruct_NoInline_Raw() noexcept {
@@ -67,40 +67,6 @@ void BM_MinStruct_NoInline_ExpectedFail(benchmark::State &state) noexcept {
   }
 }
 
-// -----------------------------------------------------------------------------
-/*
-class MoveDelete {
-public:
-  MoveDelete(MoveDelete &&) = delete;
-  std::vector<int> v;
-};
-
-__attribute__((noinline))
-static llvm::Expected<MoveDelete> MoveCtor_Delete() {
-  MoveDelete res {{
-    fastrand(), fastrand(), fastrand(), fastrand(),
-    fastrand(), fastrand(), fastrand(), fastrand()
-  }};
-  return llvm::Expected<MoveDelete>(res);
-}
-
-void REF_MoveCtor_Delete() noexcept {
-  auto res = MoveCtor_Delete();
-
-#ifndef NDEBUG
-  if (!res)
-    llvm::consumeError(res.takeError());
-#endif
-
-  benchmark::DoNotOptimize(res);
-}
-
-void BM_MoveCtor_Delete(benchmark::State &state) noexcept {
-  while (state.KeepRunning()) {
-    REF_NRVO_Expected();
-  }
-}
-*/
 // -----------------------------------------------------------------------------
 
 __attribute__((noinline))
